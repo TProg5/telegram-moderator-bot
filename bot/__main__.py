@@ -1,35 +1,37 @@
 import asyncio
-import logging
-
-from bot.config import TOKEN
+import os
 
 from aiogram import Bot, Dispatcher
-from aiogram.client.session.aiohttp import AiohttpSession
+from aiogram_i18n import I18nMiddleware
+from aiogram_i18n.cores import FluentRuntimeCore
+from dotenv import load_dotenv
 
-from bot.handlers.admins.admin_handlers import admin_command
-from bot.Middlewares.inner.ThrottlingMiddleware import ThrottlingMiddleware
-from bot.Middlewares.outer.NewMemberMiddleware import WelcomeMiddleware
+# from bot.middlewares import setup_middlewares
 
-dp = Dispatcher()
-
-session = AiohttpSession()
-bot = Bot(token=TOKEN, session=session)
-
-dp.include_router(admin_command)
-
-dp.chat_member.middleware(WelcomeMiddleware(bot=bot))
-dp.message.middleware(ThrottlingMiddleware())
+load_dotenv()
 
 
 async def main() -> None:
+    TOKEN = os.getenv("BOT_TOKEN")
+    if not TOKEN:
+        raise ValueError("BOT_TOKEN")
+    
+    dp: Dispatcher = Dispatcher()
+    bot: Bot = Bot(token=TOKEN)
+    i18n_middleware: I18nMiddleware = I18nMiddleware(
+        core=FluentRuntimeCore(
+            path="bot/locales/{locale}",
+        ),
+    )
+
+    i18n_middleware.setup(dispatcher=dp)
+
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
     try:        
-        print("Bot started")
-        logging.basicConfig(level=logging.INFO)
         asyncio.run(main())
     except KeyboardInterrupt:
         print("Bot stopped")
