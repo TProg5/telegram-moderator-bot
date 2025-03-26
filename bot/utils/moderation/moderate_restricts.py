@@ -142,6 +142,7 @@ async def handler_to_ban(
     message: Message,
     command: CommandObject
 ) -> Message:
+    
     if not message.reply_to_message.from_user:
         await reply_message_and_delete(
             bot=bot,

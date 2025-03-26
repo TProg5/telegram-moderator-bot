@@ -16,7 +16,7 @@ if DATABASE_URL is None:
     raise ValueError("No DATABASE_URL provided in environment variables.")
 
 
-engine: AsyncEngine = create_async_engine(url="")
+engine: AsyncEngine = create_async_engine(url=DATABASE_URL)
 async_session: async_sessionmaker[AsyncSession] = async_sessionmaker(bind=engine)
 
 class Base(AsyncAttrs, DeclarativeBase):

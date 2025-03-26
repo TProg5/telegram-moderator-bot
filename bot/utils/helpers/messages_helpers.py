@@ -33,7 +33,8 @@ async def reply_message_and_delete(
     button_text: Optional[str] = None,
     action: Optional[str] = None,
     user_id: Optional[int] = None
-) -> Message: 
+) -> Message:
+    
     reply_message: Message = await bot.send_message(
         text=text,
         chat_id=chat_id,
