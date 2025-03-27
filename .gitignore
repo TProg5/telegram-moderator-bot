@@ -1,0 +1,12 @@
+# Игнорируем виртуальное окружение
+.venv/
+venv/
+
+# Игнорируем кеши Python
+__pycache__/
+*.pyc
+*.pyo
+
+config.py
+
+.gitignore

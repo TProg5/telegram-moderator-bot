@@ -4,14 +4,14 @@ from typing import List
 from aiogram import Bot
 from aiogram.types import Message, User
 from aiogram_i18n import I18nContext
-from spacy.language import Language
-from spacy.tokens import Doc
+# from spacy.language import Language
+# from spacy.tokens import Doc
 
-from ..helpers import mute_with_message
+# from ..helpers import mute_with_message
 from bot.database import get_locale
 
 
-async def check_message_to_bad_words(
+''' async def check_message_to_bad_words(
     bot: Bot,
     message: Message,
     nlp_model: Language,
@@ -57,3 +57,4 @@ async def check_message_to_bad_words(
                     )
                 )
             )
+'''

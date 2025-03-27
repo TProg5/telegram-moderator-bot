@@ -5,15 +5,12 @@ from aiogram import Bot, Router
 from aiogram.filters import Command, CommandObject
 from aiogram.types import Message
 
-from bot.filters.admin_filters import is_admin
+from bot.filters.admin_filter import is_admin
 
 from bot.utils.moderation.moderate_restricts import (
     handler_to_ban, handler_to_mute, 
     handler_to_unban, handler_to_unmute
 )
-
-from bot.database.requests.sqlalchemy.users_requests import add_user
-from bot.database.requests.sqlalchemy.warns_system import add_warn_with_add_user
 
 
 admin_command = Router()
@@ -75,7 +72,7 @@ async def test_add_user(message: Message, command: CommandObject) -> None:
 
     await add_user(user_id)
 
-    await message.reply("Add to DataBase. Status: Succes")
+    await message.reply("Add to DataBase. Status: Success")
 
 
 @admin_command.message(Command("warn"))
