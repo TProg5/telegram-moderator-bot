@@ -1,6 +1,6 @@
 import asyncio
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List 
 
 from aiogram import Bot
 from aiogram_i18n import I18nContext
@@ -91,8 +91,8 @@ async def ban_with_message(
     chat_id: int, 
     user_id: int,
     message_text: str,
-    button_text: Optional[str] = None,
-    action: Optional[str] = None,
+    buttons_text: Optional[List[str]] = None,
+    callback_data: Optional[List[str]] = None,
     until_date: Optional[datetime] = None,
     message: Optional[Message] = None
 ) -> Message:
@@ -121,7 +121,7 @@ async def ban_with_message(
             bot=bot, 
             chat_id=chat_id,
             user_id=user_id, 
-            new_datetime=until_date
+            end_time=until_date
         )
     )
 
@@ -129,9 +129,8 @@ async def ban_with_message(
         bot=bot,
         chat_id=chat_id,
         text=message_text,
-        action=action,
-        user_id=user_id,
-        button_text=button_text,
+        buttons_text=buttons_text,
+        callback_data=callback_data,
         message=message
     )
 
@@ -142,8 +141,8 @@ async def mute_with_message(
     chat_id: int,
     user_id: int,  
     message_text: str,
-    button_text: Optional[str] = None,
-    action: Optional[str] = None,
+    buttons_text: Optional[List[str]] = None,
+    callback_data: Optional[List[str]] = None,
     until_date: Optional[datetime] = None,
     message: Optional[Message] = None
 ) -> Message:
@@ -173,7 +172,7 @@ async def mute_with_message(
             bot=bot, 
             chat_id=chat_id, 
             user_id=user_id, 
-            new_datetime=until_date
+            end_time=until_date
         )
     )
 
@@ -181,8 +180,7 @@ async def mute_with_message(
         bot=bot,
         chat_id=chat_id,
         text=message_text,
-        user_id=user_id,
-        action=action,
-        button_text=button_text,
+        buttons_text=buttons_text,
+        callback_data=callback_data,
         message=message
     )

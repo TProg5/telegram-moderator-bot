@@ -1,10 +1,9 @@
 import asyncio
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from contextlib import suppress
 
 from aiogram import Bot
-from aiogram.filters.callback_data import CallbackData
 from aiogram.exceptions import TelegramBadRequest
 from aiogram_i18n import I18nContext
 from aiogram.types import (
@@ -12,7 +11,7 @@ from aiogram.types import (
     Message, ChatMember
 )
 
-from bot.keyboards import moderation_keyboard
+from bot.keyboards import customed_keyboard
 
 
 async def auto_delete(
@@ -28,20 +27,19 @@ async def reply_message_and_delete(
     chat_id: int,
     bot: Bot,
     text: str, 
-    delay: float = 30.0,
+    delay: float = 10.0,
     message: Optional[Message] = None,
-    button_text: Optional[str] = None,
-    action: Optional[str] = None,
-    user_id: Optional[int] = None
-) -> Message:
-    
+    buttons_text: Optional[List[str]] = None,
+    callback_data: Optional[List[str]] = None
+
+) -> Message: 
+
     reply_message: Message = await bot.send_message(
         text=text,
         chat_id=chat_id,
-        reply_markup=await moderation_keyboard(
-            text=button_text,
-            action=action,
-            user_id=user_id
+        reply_markup=await customed_keyboard(
+            buttons_text=buttons_text,
+            callback_data=callback_data
         )
     ) 
 
@@ -64,12 +62,12 @@ async def send_unrestriction_message(
     i18n: I18nContext,
     chat_id: int,
     user_id: int, 
-    new_datetime: Optional[datetime]
+    end_time: Optional[datetime]
 ) -> None:
-    if not new_datetime:
+    if not end_time:
         return
 
-    wait_time: float = (new_datetime - datetime.now()).total_seconds()
+    wait_time: float = (end_time - datetime.now()).total_seconds()
     chat_member: ChatMember = await bot.get_chat_member(
         chat_id=chat_id, 
         user_id=user_id

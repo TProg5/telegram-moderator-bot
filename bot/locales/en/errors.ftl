@@ -5,4 +5,5 @@ error-unban = <b>Unban operation error❌</b>
 error-reply = <b>Please reply to the message❌</b>  
 error-time = <b>Error! Time less than zero❌</b>
 error-reason = <b>Reason not provided❌</b>
+error-admin = <b>You are not a group administrator❌</b>
 error-args = <b>Argument error, please enter the command arguments in the following format: 10m reason❌</b>  
