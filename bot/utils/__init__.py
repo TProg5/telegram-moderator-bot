@@ -3,7 +3,8 @@ from typing import List
 from .helpers import (
     auto_delete, 
     reply_message_and_delete, 
-    send_unrestriction_message,
+    send_unrestriction_message
+
 )
 from .moderation import (
     unban_with_message,
@@ -13,7 +14,9 @@ from .moderation import (
     handler_to_mute,
     handler_to_ban,
     handler_to_unmute,
-    handler_to_unban
+    handler_to_unban,
+    handle_unmute_for_callback,
+    handle_unban_for_callback
 )
 
 
@@ -32,5 +35,7 @@ __all__: List[str] = [
     "handler_to_ban",
     "handler_to_unmute",
     "handler_to_unban",
-    "check_message_to_bad_words"
+    "check_message_to_bad_words",
+    "handle_unmute_for_callback",
+    "handle_unban_for_callback"
 ]

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import Result, select
 
@@ -47,7 +49,10 @@ async def get_message_id(chat_id: int) -> int:
                 .where(ChatManager.chat_id == chat_id)
             )
 
-            message_id: int = result.scalar()
+            message_id: Optional[int] = result.scalar()
+            if message_id is None:
+                return 1
+
             return message_id
 
 
@@ -59,5 +64,8 @@ async def get_locale(chat_id: int) -> str:
                 .where(ChatManager.chat_id == chat_id)
             )
 
-            locale: int = result.scalar()
+            locale: Optional[str] = result.scalar()
+            if locale is None:
+                return "en"
+            
             return locale

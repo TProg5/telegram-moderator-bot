@@ -14,6 +14,11 @@ from .moderations_helpers import (
     unban_with_message
 )
 
+from .restrict_callback import (
+    handle_unban_for_callback,
+    handle_unmute_for_callback
+)
+
 
 __all__: List[str] = [
     "handler_to_mute",
@@ -23,5 +28,7 @@ __all__: List[str] = [
     "mute_with_message",
     "ban_with_message",
     "unmute_with_message",
-    "unban_with_message"
+    "unban_with_message",
+    "handle_unban_for_callback",
+    "handle_unmute_for_callback"
 ]

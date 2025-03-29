@@ -1,13 +1,17 @@
-from datetime import datetime, timedelta
-from typing import Tuple, Union, Optional
 import re
+from datetime import datetime, timedelta
+from typing import (
+    Tuple, Union, 
+    Optional
+)
 
 from aiogram import Bot
 from aiogram.filters import CommandObject
-from aiogram.types import Message
+from aiogram.types import Message, User
 from aiogram_i18n import I18nContext
 
 from ..helpers import reply_message_and_delete
+from bot.keyboards import ModerationCallback
 from bot.database import get_locale
 from .moderations_helpers import (
     unmute_with_message,
@@ -65,9 +69,10 @@ async def handler_to_mute(
     message: Message,
     command: CommandObject
 ) -> Message:
-    if not message.reply_to_message.from_user:
+    if not message.reply_to_message.from_user or not message.from_user:
         await reply_message_and_delete(
             bot=bot,
+            message=message,
             chat_id=message.chat.id,
             text=i18n.get(
                 "error-reply",
@@ -80,6 +85,7 @@ async def handler_to_mute(
     if not command.args:
         await reply_message_and_delete(
             bot=bot,
+            message=message,
             chat_id=message.chat.id,
             text=i18n.get(
                 "error-args",
@@ -89,22 +95,23 @@ async def handler_to_mute(
             )
         )
 
-    reply: Message = message.reply_to_message
-    chat_id: Optional[int] = message.chat.id
-    user_id: Optional[int] = reply.from_user.id
-    admin_full_name: Optional[str] = message.from_user.full_name
-    user_full_name: Optional[str] = reply.from_user.full_name
-    locale: str = await get_locale(chat_id=message.chat.id)
+    reply_user: User = message.reply_to_message.from_user
+    admin_user: User = message.from_user
+    chat_id: int = message.chat.id
+    user_id: int = reply_user.id
+    user_full_name: str = reply_user.full_name
+    admin_full_name: str = admin_user.full_name
+    locale: str = await get_locale(chat_id=chat_id)
     until_date, readable_time, reason = parse_time_and_reason(
         args=command.args,
         i18n=i18n
     )
 
-
     if not until_date or not readable_time:
         await reply_message_and_delete(
             bot=bot,
-            chat_id=message.chat.id,
+            message=message,
+            chat_id=chat_id,
             text=i18n.get(
                 "error-args",
                 locale
@@ -117,18 +124,25 @@ async def handler_to_mute(
         i18n=i18n,
         user_id=user_id,
         until_date=until_date,
-        action="unmute",
-        button_text=i18n.get(
-            'unmute-button',
-            locale
-        ),
+        callback_data=[
+            ModerationCallback(
+                action='unmute',
+                user_id=user_id
+            ).pack()
+        ],
+        buttons_text=[
+            i18n.get(
+                'unmute-button',
+                locale
+            )
+        ],
         message_text=i18n.get(
             "mute-user",
             locale,
             user_id=user_id,
             user_full_name=user_full_name, 
             admin_full_name=admin_full_name,
-            admin_id=message.from_user.id,
+            admin_id=admin_user.id,
             time=until_date, 
             readable_time=readable_time, 
             reason=reason
@@ -142,10 +156,11 @@ async def handler_to_ban(
     message: Message,
     command: CommandObject
 ) -> Message:
-    
-    if not message.reply_to_message.from_user:
+
+    if not message.reply_to_message.from_user or not message.from_user:
         await reply_message_and_delete(
             bot=bot,
+            message=message,
             chat_id=message.chat.id,
             text=i18n.get(
                 "error-reply",
@@ -158,6 +173,7 @@ async def handler_to_ban(
     if not command.args:
         await reply_message_and_delete(
             bot=bot,
+            message=message,
             chat_id=message.chat.id,
             text=i18n.get(
                 "error-args",
@@ -167,13 +183,13 @@ async def handler_to_ban(
             )
         )
 
-
-    reply: Message = message.reply_to_message
-    chat_id: Optional[int] = message.chat.id
-    user_id: Optional[int] = reply.from_user.id
-    admin_full_name: Optional[str] = message.from_user.full_name
-    user_full_name: Optional[str] = reply.from_user.full_name
-    locale: str = await get_locale(chat_id=message.chat.id)
+    reply_user: User = message.reply_to_message.from_user
+    admin_user: User = message.from_user
+    chat_id: int = message.chat.id
+    user_id: int = reply_user.id
+    user_full_name: str = reply_user.full_name
+    admin_full_name: str = admin_user.full_name
+    locale: str = await get_locale(chat_id=chat_id)
     until_date, readable_time, reason = parse_time_and_reason(
         args=command.args,
         i18n=i18n
@@ -182,7 +198,8 @@ async def handler_to_ban(
     if not until_date or not readable_time:
         await reply_message_and_delete(
             bot=bot,
-            chat_id=message.chat.id,
+            message=message,
+            chat_id=chat_id,
             text=i18n.get(
                 "error-args",
                 locale
@@ -195,18 +212,25 @@ async def handler_to_ban(
         i18n=i18n,
         user_id=user_id,
         until_date=until_date,
-        action="unban",
-        button_text=i18n.get(
-            "unban-button",
-            locale
-        ),
+        callback_data=[
+            ModerationCallback(
+                action='unban',
+                user_id=user_id
+            ).pack()
+        ],
+        buttons_text=[
+            i18n.get(
+                'unban-button',
+                locale
+            )
+        ],
         message_text=i18n.get(
             "ban-user",
             locale,
             user_id=user_id,
             user_full_name=user_full_name,
             admin_full_name=admin_full_name,
-            admin_id=message.from_user.id,
+            admin_id=admin_user.id,
             time=until_date,
             readable_time=readable_time,
             reason=reason
@@ -219,9 +243,10 @@ async def handler_to_unmute(
     i18n: I18nContext,
     message: Message
 ) -> Message:
-    if not message.reply_to_message.from_user:
+    if not message.reply_to_message.from_user or not message.from_user:
         await reply_message_and_delete(
             bot=bot,
+            message=message,
             chat_id=message.chat.id,
             text=i18n.get(
                 "error-reply",
@@ -231,11 +256,13 @@ async def handler_to_unmute(
             )
         )
 
-    reply: Message = message.reply_to_message
-    chat_id: Optional[int] = message.chat.id
-    user_id: Optional[int] = reply.from_user.id
-    user_full_name: Optional[str] = reply.from_user.full_name
-    locale: str = await get_locale(chat_id=message.chat.id)
+    reply_user: User = message.reply_to_message.from_user
+    admin_user: User = message.from_user
+    chat_id: int = message.chat.id
+    user_id: int = reply_user.id
+    user_full_name: str = reply_user.full_name
+    admin_full_name: str = admin_user.full_name
+    locale: str = await get_locale(chat_id=chat_id)
 
     await unmute_with_message(
         bot=bot,
@@ -246,7 +273,9 @@ async def handler_to_unmute(
             "unmute-user",
             locale,
             user_id=user_id,
-            user_full_name=user_full_name
+            user_full_name=user_full_name,
+            admin_full_name=admin_full_name,
+            admin_id=admin_user.id
         )
     )
 
@@ -256,9 +285,10 @@ async def handler_to_unban(
     i18n: I18nContext,
     message: Message
 ) -> Message:
-    if not message.reply_to_message.from_user:
+    if not message.reply_to_message.from_user or not message.from_user:
         await reply_message_and_delete(
             bot=bot,
+            message=message,
             chat_id=message.chat.id,
             text=i18n.get(
                 "error-reply",
@@ -268,11 +298,13 @@ async def handler_to_unban(
             )
         )
 
-    reply: Message = message.reply_to_message
-    chat_id: Optional[int] = message.chat.id
-    user_id: Optional[int] = reply.from_user.id
-    user_full_name: Optional[str] = reply.from_user.full_name
-    locale: str = await get_locale(chat_id=message.chat.id)
+    reply_user: User = message.reply_to_message.from_user
+    admin_user: User = message.from_user
+    chat_id: int = message.chat.id
+    user_id: int = reply_user.id
+    user_full_name: str = reply_user.full_name
+    admin_full_name: str = admin_user.full_name
+    locale: str = await get_locale(chat_id=chat_id)
 
     await unban_with_message(
         bot=bot,
@@ -283,6 +315,8 @@ async def handler_to_unban(
             "unban-user",
             locale,
             user_id=user_id,
-            user_full_name=user_full_name
+            user_full_name=user_full_name,
+            admin_full_name=admin_full_name,
+            admin_id=admin_user.id
         )
     )

@@ -1,15 +1,19 @@
-import logging
-
 from typing import Optional
-from aiogram import Bot, Router
+
+from aiogram import Bot, Router, F
 from aiogram.filters import Command, CommandObject
-from aiogram.types import Message
+from aiogram_i18n import I18nContext
+from aiogram.types import Message, CallbackQuery
 
+from bot.keyboards import ModerationCallback
 from bot.filters.admin_filter import is_admin
-
-from bot.utils.moderation.moderate_restricts import (
+from bot.database import get_locale
+from bot.utils import (
     handler_to_ban, handler_to_mute, 
-    handler_to_unban, handler_to_unmute
+    handler_to_unban, handler_to_unmute,
+    handle_unban_for_callback,
+    handle_unmute_for_callback,
+    reply_message_and_delete
 )
 
 
@@ -18,77 +22,144 @@ admin_command = Router()
 
 @admin_command.message(Command("mute"))
 @is_admin
-async def mute_users(message: Message, command: CommandObject) -> None:
+async def mute_user(
+    message: Message, 
+    command: CommandObject,
+    i18n: I18nContext
+) -> Optional[Message]:
     bot: Optional[Bot] = message.bot
+    if not bot:
+        return None
 
     if not message.reply_to_message:
-        await message.reply("reply to message users")
-        return
+        await reply_message_and_delete(
+            bot=bot,
+            chat_id=message.chat.id,
+            message=message,
+            text=i18n.get(
+                "error-reply",
+                await get_locale(
+                    chat_id=message.chat.id
+                )
+            )
+        )
 
-    await handler_to_mute(bot, message)
+    await handler_to_mute(
+        bot=bot, 
+        message=message,
+        i18n=i18n,
+        command=command
+    )
 
 
 @admin_command.message(Command("ban"))
 @is_admin
-async def ban_users(message: Message, command: CommandObject) -> None:
+async def ban_user(
+    message: Message, 
+    command: CommandObject,
+    i18n: I18nContext
+) -> Optional[Message]:
     bot: Optional[Bot] = message.bot
+    if not bot:
+        return None
 
     if not message.reply_to_message:
-        await message.reply("reply to message users")
-        return
+        await reply_message_and_delete(
+            bot=bot,
+            chat_id=message.chat.id,
+            message=message,
+            text=i18n.get(
+                "error-reply",
+                await get_locale(
+                    chat_id=message.chat.id
+                )
+            )
+        )
 
-    await handler_to_ban(bot, message)
+    await handler_to_ban(
+        bot=bot, 
+        message=message,
+        i18n=i18n,
+        command=command
+    )
 
 
 @admin_command.message(Command("unmute"))
 @is_admin
-async def unmute_user(message: Message, command: CommandObject) -> None:
+async def unmute_user(
+    message: Message,
+    i18n: I18nContext
+) -> Optional[Message]:
     bot: Optional[Bot] = message.bot
+    if not bot:
+        return None
 
     if not message.reply_to_message:
-        await message.reply("reply to message users")
-        return
+        await reply_message_and_delete(
+            bot=bot,
+            chat_id=message.chat.id,
+            message=message,
+            text=i18n.get(
+                "error-reply",
+                await get_locale(
+                    chat_id=message.chat.id
+                )
+            )
+        )
 
-    await handler_to_unmute(bot, message)
+    await handler_to_unmute(
+        bot=bot, 
+        message=message,
+        i18n=i18n
+    )
 
 
 @admin_command.message(Command("unban"))
 @is_admin
-async def unmute_user(message: Message, command: CommandObject) -> None:
+async def unban_user(
+    message: Message,
+    i18n: I18nContext
+) -> Optional[Message]:
     bot: Optional[Bot] = message.bot
+    if not bot:
+        return None
 
     if not message.reply_to_message:
-        await message.reply("reply to message users")
-        return
+        await reply_message_and_delete(
+            bot=bot,
+            chat_id=message.chat.id,
+            message=message,
+            text=i18n.get(
+                "error-reply",
+                await get_locale(
+                    chat_id=message.chat.id
+                )
+            )
+        )
 
-    await handler_to_unban(bot, message)
+    await handler_to_unban(
+        bot=bot, 
+        message=message,
+        i18n=i18n
+    )
 
 
-@admin_command.message(Command("add"))
+@admin_command.callback_query(ModerationCallback.filter(F.action == "unmute"))
 @is_admin
-async def test_add_user(message: Message, command: CommandObject) -> None:
-    bot: Optional[Bot] = message.bot
-    user_id: Optional[int] = message.from_user.id
+async def unmute_callback(
+    callback_query: CallbackQuery,
+    callback_data: ModerationCallback,
+    i18n: I18nContext
+) -> None:
+    pass
 
-    await add_user(user_id)
-
-    await message.reply("Add to DataBase. Status: Success")
 
 
-@admin_command.message(Command("warn"))
+@admin_command.callback_query(ModerationCallback.filter(F.action == "unban"))
 @is_admin
-async def warn_user(message: Message, command: CommandObject) -> None:
-    bot: Optional[Bot] = message.bot
-    user_id: Optional[int] = message.from_user.id
-    user_name: Optional[str] = message.from_user.username
-
-    if not message.reply_to_message:
-        await message.reply("reply to message users")
-        return
-    
-    
-    await add_warn_with_add_user(user_id)
-
-    await message.reply(f"User {user_name} has been warned")
-
-    
+async def unban_callback(
+    callback_query: CallbackQuery,
+    callback_data: ModerationCallback,
+    i18n: I18nContext
+) -> None:
+    pass

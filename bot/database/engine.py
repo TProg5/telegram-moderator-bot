@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import (
     AsyncEngine
 )
 
-load_dotenv(dotenv_path=os.path.join("ModeratorBotTelegram", ".env"))
+load_dotenv()
 
 DATABASE_URL: Optional[str] = os.getenv("DATABASE_URL")
 if DATABASE_URL is None:

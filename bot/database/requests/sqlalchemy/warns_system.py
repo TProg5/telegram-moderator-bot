@@ -29,6 +29,9 @@ async def add_and_get_warns(
             )
 
             warns_count: int = result.scalar()
+            if warns_count is None:
+                return 1
+
             return warns_count
         
 
