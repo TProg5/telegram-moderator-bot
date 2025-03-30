@@ -10,3 +10,5 @@ __pycache__/
 config.py
 
 .gitignore
+
+.env
