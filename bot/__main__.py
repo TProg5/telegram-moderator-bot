@@ -24,7 +24,8 @@ async def main() -> None:
     bot: Bot = Bot(token=TOKEN)
     i18n_middleware: I18nMiddleware = I18nMiddleware(
         core=FluentRuntimeCore(
-            path="bot/locale",
+            path="bot/locales/{locale}",
+            default_locale="en"
         ),
     )
 

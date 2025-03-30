@@ -11,7 +11,7 @@ def is_admin(handler):
     @wraps(handler)
     async def wrapper(
         message: Message,
-        i18n: I18nContext, 
+        # i18n: I18nContext, 
         *args, 
         **kwargs
     ):
@@ -22,16 +22,18 @@ def is_admin(handler):
         chat_id: int = message.chat.id
         user_id: int = message.from_user.id
         bot: Bot = message.bot
-        locale: str = await get_locale(chat_id=chat_id)
+        # locale: str = await get_locale(chat_id=chat_id)
         member: ChatMember = await bot.get_chat_member(
             chat_id=chat_id, 
             user_id=user_id
         )
 
-        text: str = await i18n.get(
-            "not-admin", 
-            locale
-        )
+        # text: str = await i18n.get(
+        #     "not-admin", 
+        #     locale
+        # )
+
+        text = "You are not a administrator"
 
         if member.status in ["creator", "administrator"]:
             return await handler(message, *args, **kwargs)
@@ -42,7 +44,6 @@ def is_admin(handler):
             text=text,
             delay=10,
             message=message,
-            user_id=user_id
         )
 
     return wrapper
