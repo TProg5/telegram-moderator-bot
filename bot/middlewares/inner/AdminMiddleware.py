@@ -4,18 +4,10 @@ from aiogram_i18n import I18nContext
 from aiogram import BaseMiddleware, Bot
 from aiogram.types import CallbackQuery, Chat, Message, TelegramObject
 
-from utils.spacy_functions.filter_messages import get_locale
-
 
 class CallbackAdminCheckerMiddleware:
-    def __init__(
-            self, 
-            bot: Bot,
-            i18n: I18nContext
-        ):
-
+    def __init__(self, bot: Bot):
         self.bot = bot
-        self.i18n = i18n
 
     async def __call__(
         self,
@@ -35,13 +27,6 @@ class CallbackAdminCheckerMiddleware:
         member = await self.bot.get_chat_member(
             chat_id=chat_id, user_id=user_id
             )
-
-        text = self.i18n.get(
-            "not-admin-callback",  # Важно! Данной локализации не существует, нужно добавить
-            await get_locale(
-                    chat_id=chat_id
-                )
-        )
         
         if member.status not in ("administrator", "creator"):
             await event.answer("Admins Only", show_alert=True)

@@ -9,8 +9,9 @@ from aiogram_i18n.cores import FluentRuntimeCore
 from dotenv import load_dotenv
 
 from bot.handlers.admin.admin_handlers import admin_command
+from bot.handlers.empty.emty_chat_member_handlers import empty_member
 
-# from bot.middlewares import setup_middlewares
+from bot.middlewares import setup_middlewares
 
 load_dotenv()
 
@@ -31,10 +32,14 @@ async def main() -> None:
 
     i18n_middleware.setup(dispatcher=dp)
 
-    dp.include_router(admin_command)
+    dp.include_routers(admin_command, empty_member)
+    setup_middlewares(dp=dp, bot=bot)
 
     await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
+    await dp.start_polling(
+            bot,
+            allowed_updates=dp.resolve_used_update_types()
+        )
 
 
 if __name__ == "__main__":
