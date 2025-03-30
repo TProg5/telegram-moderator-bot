@@ -22,8 +22,8 @@ def upgrade() -> None:
     op.create_table(
         'warns_system',
         sa.Column('id', sa.Integer()),
-        sa.Column('user_id', sa.Integer()),
-        sa.Column('chat_id', sa.Integer()),
+        sa.Column('user_id', sa.BigInteger()),
+        sa.Column('chat_id', sa.BigInteger()),
         sa.Column('warns', sa.Integer(), default=0),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint(

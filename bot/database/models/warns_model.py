@@ -2,7 +2,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import (
     BigInteger, Integer,
     PrimaryKeyConstraint,
-    UniqueConstraint
+    UniqueConstraint,
+    BIGINT
 )
 
 from bot.database.engine import Base

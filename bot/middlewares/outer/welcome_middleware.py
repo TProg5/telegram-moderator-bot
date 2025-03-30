@@ -11,6 +11,8 @@ from aiogram.types import (
     User, Update
 )
 
+from bot.database.requests.sqlalchemy import add_and_get_warns
+
 
 class WelcomeMiddleware(BaseMiddleware):
     def __init__(self, bot: Bot):
@@ -32,16 +34,21 @@ class WelcomeMiddleware(BaseMiddleware):
                 old_member = member.old_chat_member
                 
                 user: User = new_member.user
+                user_id: int = user.id
 
                 if new_member.status == "member" or old_member.status == "left":
                     chat_id = member.chat.id
 
                     await self.bot.send_message(
                         chat_id=chat_id,
-                        text=f"👋 <b>Welcome</b>, <a href='tg://user?id={user.id}'><b>{user.full_name}</b></a>",
+                        text=f"👋 <b>Welcome</b>, <a href='tg://user?id={user_id}'><b>{user.full_name}</b></a>",
                         parse_mode="HTML"
                     )
                     
+                    await add_and_get_warns(
+                        user_id=user_id,
+                        chat_id=chat_id
+                    )
             else:
                 logging.warning(f"Unexpected event type: {event}")
 

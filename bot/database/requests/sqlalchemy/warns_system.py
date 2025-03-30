@@ -53,3 +53,25 @@ async def delete_warns(
                     )
                 )
             )
+
+
+async def add_user(
+        user_id: int,
+        chat_id: int
+    ) -> None:
+
+    async with async_session() as session:
+        async with session.begin():
+            await session.execute(
+                insert(Warns)
+                .values(
+                    user_id=user_id, 
+                    chat_id=chat_id
+                ).on_conflict_do_nothing(
+                    index_elements=[
+                        'user_id',
+                        'chat_id'
+                    ]
+                )
+            )
+ 
